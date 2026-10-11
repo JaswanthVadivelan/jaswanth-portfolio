@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: "pages"
@@ -16,9 +14,6 @@ concurrency:
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -36,17 +31,8 @@ jobs:
       - name: Build Angular app with relative base-href
         run: npx ng build --base-href=./
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          enablement: true
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'dist/jaswanth-portfolio/browser'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
+          folder: dist/jaswanth-portfolio/browser
+          branch: gh-pages
