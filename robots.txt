@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jaswanthvadivelan.github.io/sitemap.xml
+
