@@ -75,13 +75,4 @@ export interface NavLink {
   href: string;
 }
 
-export interface JourneyStation {
-  id: string;
-  number: string;
-  name: string;
-  subtitle: string;
-  sector: string;
-  icon: string;
-  coordinates: string;
-}
 

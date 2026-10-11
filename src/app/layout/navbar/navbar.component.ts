@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { JourneyStateService } from '../../core/services/journey-state.service';
+import { ScrollSpyService } from '../../core/services/scroll-spy.service';
+import { NAV_LINKS } from '../../data/navigation.data';
 import { PROFILE_DATA } from '../../data/profile.data';
 
 @Component({
@@ -8,127 +9,114 @@ import { PROFILE_DATA } from '../../data/profile.data';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <header class="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
-      
-      <!-- Top Station Line Strip -->
-      <div class="h-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600"></div>
-
-      <!-- Main Game HUD -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
       <nav
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 bg-slate-950/95 backdrop-blur-md rounded-b-2xl sm:mt-1 sm:rounded-2xl sm:mx-4 lg:mx-auto border border-slate-800 shadow-xl text-white select-none"
-        aria-label="Game HUD Navigation"
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs sm:mt-2 sm:rounded-2xl sm:mx-4 lg:mx-auto sm:border"
+        aria-label="Main Navigation"
       >
         <div class="flex items-center justify-between gap-4">
           
-          <!-- Logo & Status -->
-          <div class="flex items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              (click)="journeyState.goToStation(0, 'warp')"
-              class="flex items-center gap-2 font-bold text-left group cursor-pointer"
-            >
-              <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-mono text-sm font-bold shadow-md shadow-blue-500/20 group-hover:bg-blue-500 transition-colors">
-                JV
-              </span>
-              <span class="flex flex-col">
-                <span class="leading-none text-white font-bold text-sm">{{ profile.name }}</span>
-                <span class="text-[10px] font-mono text-cyan-400 font-semibold leading-tight">SYS: ONLINE</span>
-              </span>
-            </button>
-          </div>
+          <!-- Logo / Identity -->
+          <a
+            href="#about"
+            (click)="onNavClick($event, 'about')"
+            class="flex items-center gap-2.5 font-bold text-lg tracking-tight text-slate-900 group"
+          >
+            <span class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-mono text-sm font-bold shadow-xs shadow-blue-500/20 group-hover:bg-blue-700 transition-colors">
+              JV
+            </span>
+            <span class="flex flex-col">
+              <span class="leading-none text-slate-900 font-bold text-sm sm:text-base">{{ profile.name }}</span>
+              <span class="text-[11px] text-slate-500 font-normal leading-tight">{{ profile.role }}</span>
+            </span>
+          </a>
 
-          <!-- Center: 6-Station Quick Rail (Desktop) -->
-          <div class="hidden md:flex items-center gap-1 p-1 rounded-xl bg-slate-900 border border-slate-800">
-            @for (st of journeyState.stations; track st.id; let idx = $index) {
-              <button
-                type="button"
-                (click)="journeyState.goToStation(idx, 'warp')"
-                class="px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                [class.bg-blue-600]="journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx"
-                [class.text-white]="journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx"
-                [class.shadow-md]="journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx"
-                [class.text-slate-400]="!(journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx)"
-                [class.hover:text-white]="!(journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx)"
-                [class.hover:bg-slate-800]="!(journeyState.currentView() === 'station' && journeyState.activeStationIndex() === idx)"
+          <!-- Desktop Navigation Links -->
+          <div class="hidden md:flex items-center gap-1">
+            @for (item of navLinks; track item.id) {
+              <a
+                [href]="item.href"
+                (click)="onNavClick($event, item.id)"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150"
+                [class.bg-blue-50]="scrollSpy.activeSection() === item.id"
+                [class.text-blue-600]="scrollSpy.activeSection() === item.id"
+                [class.text-slate-600]="scrollSpy.activeSection() !== item.id"
+                [class.hover:text-slate-900]="scrollSpy.activeSection() !== item.id"
+                [class.hover:bg-slate-100]="scrollSpy.activeSection() !== item.id"
               >
-                <span>{{ st.number }}</span>
-                <span class="hidden lg:inline text-[11px] font-sans font-medium">{{ st.name.split(' ')[0] }}</span>
-              </button>
+                {{ item.label }}
+              </a>
             }
           </div>
 
-          <!-- Right Action: World Map Toggle & Stepper -->
-          <div class="flex items-center gap-2 shrink-0">
-            
-            <!-- Quick Station Stepper [◀] [▶] -->
-            <div class="flex items-center gap-1 p-0.5 rounded-lg bg-slate-900 border border-slate-800">
-              <button
-                type="button"
-                (click)="journeyState.prevStation()"
-                [disabled]="journeyState.isFirstStation()"
-                class="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                title="Previous Station [A / ←]"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              <span class="text-[10px] font-mono px-1 font-bold text-cyan-300">
-                {{ journeyState.activeStation().number }}/06
-              </span>
+          <!-- Right Action: Resume / Contact CTA & Mobile Toggle -->
+          <div class="flex items-center gap-2">
+            <a
+              href="#contact"
+              (click)="onNavClick($event, 'contact')"
+              class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-xs transition-colors"
+            >
+              <span>Get in Touch</span>
+              <span>→</span>
+            </a>
 
-              <button
-                type="button"
-                (click)="journeyState.nextStation()"
-                [disabled]="journeyState.isLastStation()"
-                class="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                title="Next Station [D / →]"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- World Map View Toggle Button -->
+            <!-- Mobile Hamburger Button -->
             <button
               type="button"
-              (click)="journeyState.toggleView()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all shadow-md cursor-pointer"
-              [class.bg-cyan-500]="journeyState.currentView() === 'map'"
-              [class.text-slate-950]="journeyState.currentView() === 'map'"
-              [class.bg-blue-600]="journeyState.currentView() !== 'map'"
-              [class.hover:bg-blue-500]="journeyState.currentView() !== 'map'"
-              [class.text-white]="journeyState.currentView() !== 'map'"
+              (click)="toggleMobileMenu()"
+              class="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer"
+              [attr.aria-expanded]="mobileMenuOpen()"
+              aria-label="Toggle navigation"
             >
-              @if (journeyState.currentView() === 'map') {
-                <span>EXIT MAP [Esc]</span>
+              @if (!mobileMenuOpen()) {
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               } @else {
-                <span class="w-2 h-2 rounded-full bg-cyan-300 animate-pulse"></span>
-                <span>WORLD MAP [M]</span>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               }
             </button>
-
           </div>
 
         </div>
 
-        <!-- Active Station Context Sub-bar -->
-        <div class="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <div class="flex items-center gap-2 truncate">
-            <span class="text-cyan-400 font-bold">CURRENT:</span>
-            <span class="text-white font-semibold truncate">{{ journeyState.activeStation().number }} // {{ journeyState.activeStation().name }}</span>
+        <!-- Mobile Drawer -->
+        @if (mobileMenuOpen()) {
+          <div class="md:hidden pt-3 mt-3 border-t border-slate-100 space-y-1">
+            @for (item of navLinks; track item.id) {
+              <a
+                [href]="item.href"
+                (click)="onNavClick($event, item.id)"
+                class="block px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
+                [class.bg-blue-50]="scrollSpy.activeSection() === item.id"
+                [class.text-blue-600]="scrollSpy.activeSection() === item.id"
+                [class.text-slate-700]="scrollSpy.activeSection() !== item.id"
+              >
+                {{ item.label }}
+              </a>
+            }
           </div>
-          <span class="hidden sm:inline text-[10px] text-slate-500">{{ journeyState.activeStation().coordinates }}</span>
-        </div>
-
+        }
       </nav>
-
     </header>
   `
 })
 export class NavbarComponent {
-  readonly journeyState = inject(JourneyStateService);
+  readonly scrollSpy = inject(ScrollSpyService);
   readonly profile = PROFILE_DATA;
+  readonly navLinks = NAV_LINKS;
+
+  readonly mobileMenuOpen = signal<boolean>(false);
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update((v) => !v);
+  }
+
+  onNavClick(event: Event, id: string): void {
+    event.preventDefault();
+    this.mobileMenuOpen.set(false);
+    this.scrollSpy.scrollToSection(id);
+  }
 }

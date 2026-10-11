@@ -1,47 +1,30 @@
-<div class="relative min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
+<div class="relative min-h-screen flex flex-col bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
   
-  <!-- Fixed Game HUD Navigation Bar -->
+  <!-- Sticky Glassmorphic Navigation Bar -->
   <app-navbar />
 
-  <!-- High-Speed Cinematic Route Transit FX -->
-  <app-route-transit />
+  <!-- Main Professional Portfolio Content Stream -->
+  <main class="relative z-10 flex-grow">
+    <!-- Hero / About Me -->
+    <app-hero />
 
-  <!-- Main Viewport Switcher -->
-  <main class="relative z-10 flex-grow flex flex-col">
-    
-    <!-- VIEW 1: Interactive Cyber Overworld Mission Map -->
-    @if (journeyState.currentView() === 'map') {
-      <div class="flex-grow animate-in fade-in zoom-in-98 duration-200">
-        <app-world-map />
-      </div>
-    }
+    <!-- Professional Experience -->
+    <app-experience />
 
-    <!-- VIEW 2: Dedicated Interactive Station Viewports -->
-    @if (journeyState.currentView() === 'station') {
-      <div class="flex-grow animate-in fade-in duration-200">
-        @switch (journeyState.activeStationIndex()) {
-          @case (0) {
-            <app-hero />
-          }
-          @case (1) {
-            <app-architecture />
-          }
-          @case (2) {
-            <app-robotics-station />
-          }
-          @case (3) {
-            <app-game-station />
-          }
-          @case (4) {
-            <app-vault-station />
-          }
-          @case (5) {
-            <app-contact />
-          }
-        }
-      </div>
-    }
+    <!-- Featured Projects -->
+    <app-projects />
 
+    <!-- Technical Skills -->
+    <app-skills />
+
+    <!-- Education -->
+    <app-education />
+
+    <!-- Achievements & Honors -->
+    <app-achievements />
+
+    <!-- Contact & Resume Dossier -->
+    <app-contact />
   </main>
 
   <!-- Global Footer -->

@@ -1,117 +1,135 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { HeroComponent } from './features/hero/hero.component';
-import { ArchitectureComponent } from './features/architecture/architecture.component';
-import { RoboticsStationComponent } from './features/robotics-station/robotics-station.component';
-import { GameStationComponent } from './features/game-station/game-station.component';
-import { VaultStationComponent } from './features/vault-station/vault-station.component';
+import { ExperienceComponent } from './features/experience/experience.component';
+import { ProjectsComponent } from './features/projects/projects.component';
+import { SkillsComponent } from './features/skills/skills.component';
+import { EducationComponent } from './features/education/education.component';
+import { AchievementsComponent } from './features/achievements/achievements.component';
 import { ContactComponent } from './features/contact/contact.component';
 
-describe('Station 01: Hero & Command Deck', () => {
+describe('HeroComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HeroComponent]
     }).compileComponents();
   });
 
-  it('should initialize and render authentic profile details', () => {
+  it('should initialize and render authentic profile details and metrics', () => {
     const fixture = TestBed.createComponent(HeroComponent);
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();
     expect(component.profile.name).toBe('Jaswanth V.');
     expect(component.profile.company).toBe('ProdXP.ai');
+    expect(component.aboutData.keyPillars.length).toBe(3);
   });
 });
 
-describe('Station 02: ProdXP MES Command Hub', () => {
+describe('ExperienceComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ArchitectureComponent]
+      imports: [ExperienceComponent]
     }).compileComponents();
   });
 
-  it('should initialize with 5 conceptual workflow stages', () => {
-    const fixture = TestBed.createComponent(ArchitectureComponent);
+  it('should initialize with 4 verified professional experiences', () => {
+    const fixture = TestBed.createComponent(ExperienceComponent);
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();
-    expect(component.stages.length).toBe(5);
-    expect(component.currentStage().name).toBe('Production Planning');
-  });
-
-  it('should jump between stages accurately', () => {
-    const fixture = TestBed.createComponent(ArchitectureComponent);
-    const component = fixture.componentInstance;
-    component.jumpToStage(3);
-    expect(component.activeStageIndex()).toBe(3);
-    expect(component.currentStage().name).toBe('Quality Inspection');
+    expect(component.experiences.length).toBe(4);
+    expect(component.experiences[0].company).toBe('ProdXP.ai');
+    expect(component.experiences[0].employmentType).toBe('Full-time');
   });
 });
 
-describe('Station 03: SMTP AI Robotics Vision Lab', () => {
+describe('ProjectsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RoboticsStationComponent]
+      imports: [ProjectsComponent]
     }).compileComponents();
   });
 
-  it('should initialize with 4 gesture triggers and default to Open Palm', () => {
-    const fixture = TestBed.createComponent(RoboticsStationComponent);
+  it('should initialize with 3 signature engineering projects', () => {
+    const fixture = TestBed.createComponent(ProjectsComponent);
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();
-    expect(component.gestures.length).toBe(4);
-    expect(component.activeGesture().id).toBe('open_palm');
+    expect(component.projects.length).toBe(3);
+    expect(component.activeProject()?.id).toBe('mes-industrial-software');
   });
 
-  it('should update gesture and gripper state on selection', () => {
-    const fixture = TestBed.createComponent(RoboticsStationComponent);
+  it('should switch active project tab', () => {
+    const fixture = TestBed.createComponent(ProjectsComponent);
     const component = fixture.componentInstance;
-    const fistGesture = component.gestures.find((g) => g.id === 'fist')!;
-    component.selectGesture(fistGesture);
-    expect(component.activeGesture().id).toBe('fist');
-    expect(component.gripperState()).toBe('CLOSED');
+    component.selectedProjectId.set('ai-robotic-arm');
+    expect(component.activeProject()?.id).toBe('ai-robotic-arm');
+    expect(component.activeProject()?.title).toContain('Robotic Arm');
   });
 });
 
-describe('Station 04: Monolith Shogun Game Engine Studio', () => {
+describe('SkillsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GameStationComponent]
-    }).compileComponents();
-  });
-
-  it('should toggle between 60 FPS and 30 FPS modes', () => {
-    const fixture = TestBed.createComponent(GameStationComponent);
-    const component = fixture.componentInstance;
-    expect(component.fpsMode()).toBe('60fps');
-    component.setMode('30fps');
-    expect(component.fpsMode()).toBe('30fps');
-  });
-});
-
-describe('Station 05: Tech Arsenal & Academic Vault', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [VaultStationComponent]
+      imports: [SkillsComponent]
     }).compileComponents();
   });
 
   it('should filter skill categories by search query', () => {
-    const fixture = TestBed.createComponent(VaultStationComponent);
+    const fixture = TestBed.createComponent(SkillsComponent);
     const component = fixture.componentInstance;
     component.searchQuery.set('Angular');
-    const filtered = component.filteredSkillCategories();
-    expect(filtered.some((cat) => cat.skills.includes('Angular'))).toBe(true);
+    const filtered = component.filteredCategories();
+    expect(filtered.some((cat) => cat.skills.some((s) => s.toLowerCase().includes('angular')))).toBe(true);
+  });
+
+  it('should filter by category tabs', () => {
+    const fixture = TestBed.createComponent(SkillsComponent);
+    const component = fixture.componentInstance;
+    component.selectedCategoryTab.set('Frontend');
+    const filtered = component.filteredCategories();
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((cat) => cat.title.includes('Frontend'))).toBe(true);
   });
 });
 
-describe('Station 06: Transmission Base & Comms Relay', () => {
+describe('EducationComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [EducationComponent]
+    }).compileComponents();
+  });
+
+  it('should display degree with 8.5 CGPA and Rank 3 distinction', () => {
+    const fixture = TestBed.createComponent(EducationComponent);
+    const component = fixture.componentInstance;
+    expect(component).toBeTruthy();
+    expect(component.education[0].score).toBe('8.5 / 10');
+    expect(component.education[0].achievements?.[0]).toContain('Third rank');
+  });
+});
+
+describe('AchievementsComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AchievementsComponent]
+    }).compileComponents();
+  });
+
+  it('should initialize with 5 verified academic and technical honors', () => {
+    const fixture = TestBed.createComponent(AchievementsComponent);
+    const component = fixture.componentInstance;
+    expect(component).toBeTruthy();
+    expect(component.achievements.length).toBe(5);
+  });
+});
+
+describe('ContactComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ContactComponent]
     }).compileComponents();
   });
 
-  it('should initialize with verified LinkedIn and GitHub links', () => {
+  it('should initialize with verified LinkedIn and GitHub profiles', () => {
     const fixture = TestBed.createComponent(ContactComponent);
     const component = fixture.componentInstance;
     expect(component.profile.socials.linkedin).toContain('linkedin.com/in/jaswanthvadivelan');

@@ -1,100 +1,84 @@
-import { Component, inject, signal, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PROFILE_DATA, ABOUT_ME_DATA } from '../../data/profile.data';
-import { JourneyStateService } from '../../core/services/journey-state.service';
-import { AnimationService } from '../../core/services/animation.service';
+import { ScrollSpyService } from '../../core/services/scroll-spy.service';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section id="station-origin" class="relative py-20 lg:py-24 overflow-hidden bg-slate-950 text-white min-h-[calc(100vh-4.5rem)] flex flex-col justify-center">
-      <!-- Architectural background dot grid -->
-      <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
+    <section id="about" class="relative pt-32 sm:pt-40 pb-20 sm:pb-28 overflow-hidden bg-white">
+      
+      <!-- Subtle Grid Pattern Background -->
+      <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none"></div>
 
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Station Sector Header -->
-        <div class="flex items-center justify-between gap-4 pb-4 mb-8 border-b border-slate-800">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/80 border border-blue-800 text-blue-300 text-xs font-mono font-semibold">
-            <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-            <span>STATION 01 // COMMAND DECK & IDENTITY ORIGIN</span>
-          </div>
-          <div class="font-mono text-[11px] text-slate-400 hidden sm:flex items-center gap-2">
-            <span>SYS: <strong class="text-emerald-400">ONLINE</strong></span>
-            <span>•</span>
-            <span>WAYPOINT: <strong class="text-cyan-300">13.0827° N, 80.2707° E</strong></span>
-          </div>
-        </div>
-
+        <!-- Main Hero Grid: Info Left / Authentic Portrait Right -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          <!-- Left Column: Introduction, Identity & Primary CTAs -->
+          <!-- Left Column: Introduction & Primary CTAs (7 cols) -->
           <div class="lg:col-span-7 flex flex-col items-start text-left">
             
             <!-- Company & Status Pill -->
-            <div class="hero-stagger-item inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/80 border border-blue-800 text-blue-300 text-xs font-semibold mb-5 shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span class="font-mono text-[11px] uppercase tracking-wider text-slate-300 font-semibold">{{ profile.company }}</span>
-              <span class="text-blue-400">•</span>
-              <span class="text-cyan-300 font-bold">{{ profile.role }}</span>
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-6 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-mono text-[11px] uppercase tracking-wider text-slate-800 font-bold">{{ profile.company }}</span>
+              <span class="text-blue-300">•</span>
+              <span class="text-blue-700 font-semibold">{{ profile.role }}</span>
             </div>
 
             <!-- Headline -->
-            <h1 class="hero-stagger-item text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.15] mb-5">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.18] mb-6">
               {{ profile.headline }}
             </h1>
 
             <!-- Introduction Paragraphs -->
-            <div class="space-y-3.5 text-slate-300 text-base sm:text-lg leading-relaxed mb-8 max-w-2xl">
+            <div class="space-y-4 text-slate-600 text-base sm:text-lg leading-relaxed mb-8 max-w-2xl">
               @for (paragraph of profile.introduction; track $index) {
-                <p class="hero-stagger-item" [class.font-semibold]="$index === 0" [class.text-white]="$index === 0">
+                <p [class.font-semibold]="$index === 0" [class.text-slate-900]="$index === 0">
                   {{ paragraph }}
                 </p>
               }
             </div>
 
-            <!-- Action Buttons / Expedition Starter -->
-            <div class="hero-stagger-item flex flex-wrap items-center gap-3.5 mb-8 w-full sm:w-auto">
-              <!-- Initiate Journey CTA -->
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-3.5 mb-10 w-full sm:w-auto">
               <button
                 type="button"
-                (click)="onScrollTo('station-mes')"
-                class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 active:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all duration-200 cursor-pointer group hover:scale-105"
+                (click)="onScrollTo('experience')"
+                class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 active:bg-blue-800 shadow-md shadow-blue-500/20 transition-all duration-150 cursor-pointer"
               >
-                <span>Initiate Expedition (Next Station)</span>
-                <span class="font-bold text-white group-hover:translate-x-1 transition-transform">➔</span>
+                <span>View Experience</span>
+                <span>↓</span>
               </button>
 
-              <!-- World Map Quick Open -->
               <button
                 type="button"
-                (click)="journeyState.openMap()"
-                class="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-slate-900 text-cyan-300 font-semibold text-sm hover:bg-slate-800 border border-slate-700 transition-all duration-200 cursor-pointer"
+                (click)="onScrollTo('projects')"
+                class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-50 text-slate-800 font-semibold text-sm hover:bg-slate-100 border border-slate-200 transition-all duration-150 cursor-pointer"
               >
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                <span>Open World Map [M]</span>
+                <span>Featured Projects</span>
               </button>
 
-              <!-- Resume Details CTA -->
               <button
                 type="button"
-                (click)="onScrollTo('station-comms')"
-                class="inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white font-medium text-sm transition-colors cursor-pointer"
+                (click)="onScrollTo('contact')"
+                class="inline-flex items-center justify-center px-4 py-3.5 text-slate-600 hover:text-blue-600 font-semibold text-sm transition-colors cursor-pointer"
               >
-                <span>Resume &amp; Comms →</span>
+                <span>Get in Touch →</span>
               </button>
             </div>
 
-            <!-- Social Links & Coordinates -->
-            <div class="hero-stagger-item flex items-center gap-6 pt-5 border-t border-slate-800 w-full">
+            <!-- Social Links & Location -->
+            <div class="flex items-center gap-6 pt-6 border-t border-slate-100 w-full">
               <div class="flex items-center gap-2.5">
                 <a
                   [href]="profile.socials.linkedin"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="p-2.5 rounded-lg bg-slate-900 text-slate-300 hover:text-cyan-300 hover:bg-slate-800 border border-slate-800 transition-all duration-200"
+                  class="p-2.5 rounded-lg bg-slate-50 text-slate-700 hover:text-blue-600 hover:bg-blue-50 border border-slate-200 transition-colors"
                   aria-label="Jaswanth V. on LinkedIn"
                 >
                   <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -105,7 +89,7 @@ import { AnimationService } from '../../core/services/animation.service';
                   [href]="profile.socials.github"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="p-2.5 rounded-lg bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition-all duration-200"
+                  class="p-2.5 rounded-lg bg-slate-50 text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors"
                   aria-label="Jaswanth V. on GitHub"
                 >
                   <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -113,57 +97,51 @@ import { AnimationService } from '../../core/services/animation.service';
                   </svg>
                 </a>
               </div>
-              <div class="text-xs text-slate-400 font-mono">
+              <div class="text-xs text-slate-500 font-medium">
                 📍 {{ profile.location }}
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Interactive Portrait Chassis & Telemetry Orbiters -->
+          <!-- Right Column: Authentic Portrait Card & Floating Tech Tags (5 cols) -->
           <div class="lg:col-span-5 flex justify-center">
             <div class="relative w-full max-w-sm">
               
-              <!-- Floating Orbiter Badges -->
-              <div class="hidden sm:flex absolute -top-4 -left-6 z-20 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-xl text-[11px] font-mono font-semibold text-cyan-300 items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+              <!-- Floating Tech Badges -->
+              <div class="hidden sm:flex absolute -top-4 -left-6 z-20 px-3 py-1.5 rounded-xl bg-white border border-slate-200/90 shadow-md text-[11px] font-mono font-semibold text-blue-700 items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                 <span>Angular 22</span>
               </div>
 
-              <div class="hidden sm:flex absolute -bottom-3 -left-4 z-20 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-xl text-[11px] font-mono font-semibold text-slate-300 items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              <div class="hidden sm:flex absolute -bottom-3 -left-4 z-20 px-3 py-1.5 rounded-xl bg-white border border-slate-200/90 shadow-md text-[11px] font-mono font-semibold text-slate-800 items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
                 <span>Django REST</span>
               </div>
 
-              <div class="hidden sm:flex absolute top-1/2 -right-6 z-20 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-xl text-[11px] font-mono font-semibold text-emerald-400 items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <div class="hidden sm:flex absolute top-1/2 -right-6 z-20 px-3 py-1.5 rounded-xl bg-white border border-slate-200/90 shadow-md text-[11px] font-mono font-semibold text-emerald-700 items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 <span>PostgreSQL</span>
               </div>
 
-              <!-- Main Chassis Card with 3D Tilt -->
-              <div
-                #cardContainer
-                (mousemove)="onMouseMove($event)"
-                (mouseleave)="onMouseLeave()"
-                class="relative rounded-3xl bg-slate-900 border border-slate-800 p-4 shadow-2xl transition-transform duration-200 ease-out"
-                [style.transform]="cardTransform()"
-              >
-                <!-- Chassis Top Bar -->
-                <div class="flex items-center justify-between pb-3 px-1 text-[11px] font-mono text-slate-400">
+              <!-- Main Card -->
+              <div class="clean-card p-4 shadow-xl">
+                <!-- Top Status Header -->
+                <div class="flex items-center justify-between pb-3 px-1 text-[11px] font-mono text-slate-500">
                   <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="font-semibold text-slate-200 uppercase">SYS: ONLINE</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="font-semibold text-slate-700 uppercase">SYS: ONLINE</span>
                   </div>
                   <span>PRODXP.AI MES</span>
                 </div>
 
-                <!-- Portrait Photo Box -->
-                <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-inner">
+                <!-- Authentic Portrait Image -->
+                <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-inner">
                   @if (imageLoaded()) {
                     <img
                       src="assets/images/Jaswanth-self-portrait.png"
                       alt="Jaswanth V. - Full-stack Software Developer"
                       (error)="onImageError()"
-                      class="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-105"
+                      class="w-full h-full object-cover object-top"
                     />
                   } @else {
                     <!-- Monogram Fallback Avatar -->
@@ -175,10 +153,10 @@ import { AnimationService } from '../../core/services/animation.service';
                   }
                 </div>
 
-                <!-- Chassis Bottom Telemetry Ribbon -->
-                <div class="pt-3 px-1 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <span class="text-cyan-400 font-semibold">CHENNAI // IND</span>
-                  <span class="text-slate-500">B.TECH AI &amp; DS</span>
+                <!-- Bottom Telemetry Ribbon -->
+                <div class="pt-3 px-1 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                  <span class="text-blue-600 font-semibold">CHENNAI // IND</span>
+                  <span class="text-slate-400">B.TECH AI &amp; DS</span>
                 </div>
               </div>
 
@@ -188,82 +166,60 @@ import { AnimationService } from '../../core/services/animation.service';
         </div>
 
         <!-- Core Impact Metrics Ticker -->
-        <div class="mt-12 pt-8 border-t border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-            <div class="text-3xl sm:text-4xl font-extrabold text-blue-400 font-mono">8.5</div>
-            <div class="text-xs font-semibold text-slate-200 mt-1">B.Tech CGPA</div>
-            <div class="text-[11px] text-slate-400">Distinction Grade</div>
+        <div class="mt-16 pt-10 border-t border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div class="clean-card p-5 text-center">
+            <div class="text-3xl sm:text-4xl font-extrabold text-blue-600 font-mono">8.5</div>
+            <div class="text-xs font-semibold text-slate-800 mt-1">B.Tech CGPA</div>
+            <div class="text-[11px] text-slate-500">First Class Distinction</div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-            <div class="text-3xl sm:text-4xl font-extrabold text-cyan-400 font-mono">#3</div>
-            <div class="text-xs font-semibold text-slate-200 mt-1">Department Rank</div>
-            <div class="text-[11px] text-slate-400">AI &amp; Data Science</div>
+          <div class="clean-card p-5 text-center">
+            <div class="text-3xl sm:text-4xl font-extrabold text-indigo-600 font-mono">#3</div>
+            <div class="text-xs font-semibold text-slate-800 mt-1">Department Rank</div>
+            <div class="text-[11px] text-slate-500">AI &amp; Data Science</div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-            <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400 font-mono">4</div>
-            <div class="text-xs font-semibold text-slate-200 mt-1">Engineering Roles</div>
-            <div class="text-[11px] text-slate-400">Full-time &amp; Research</div>
+          <div class="clean-card p-5 text-center">
+            <div class="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-mono">4</div>
+            <div class="text-xs font-semibold text-slate-800 mt-1">Engineering Roles</div>
+            <div class="text-[11px] text-slate-500">Full-time &amp; Research</div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-            <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400 font-mono">100%</div>
-            <div class="text-xs font-semibold text-slate-200 mt-1">Production Focus</div>
-            <div class="text-[11px] text-slate-400">Industrial Scalability</div>
+          <div class="clean-card p-5 text-center">
+            <div class="text-3xl sm:text-4xl font-extrabold text-cyan-600 font-mono">100%</div>
+            <div class="text-xs font-semibold text-slate-800 mt-1">Production Focus</div>
+            <div class="text-[11px] text-slate-500">Industrial Scalability</div>
           </div>
+        </div>
+
+        <!-- Engineering Pillars Overview -->
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+          @for (pillar of aboutData.keyPillars; track pillar.title) {
+            <div class="clean-card p-6 flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm mb-2">{{ pillar.title }}</h3>
+                <p class="text-xs text-slate-600 leading-relaxed">{{ pillar.description }}</p>
+              </div>
+            </div>
+          }
         </div>
 
       </div>
     </section>
   `
 })
-export class HeroComponent implements AfterViewInit, OnDestroy {
+export class HeroComponent {
   readonly profile = PROFILE_DATA;
   readonly aboutData = ABOUT_ME_DATA;
-
-  readonly journeyState = inject(JourneyStateService);
-  private readonly anim = inject(AnimationService);
-
-  @ViewChild('cardContainer') cardContainer!: ElementRef<HTMLDivElement>;
+  private readonly scrollSpy = inject(ScrollSpyService);
 
   readonly imageLoaded = signal<boolean>(true);
-  readonly cardTransform = signal<string>('perspective(1000px) rotateX(0deg) rotateY(0deg)');
-
-  ngAfterViewInit(): void {
-    const isReduced = this.anim.isReducedMotion();
-    if (!isReduced) {
-      const staggerTargets = document.querySelectorAll('#station-origin .hero-stagger-item');
-      if (staggerTargets.length > 0) {
-        this.anim.staggerFadeUp(Array.from(staggerTargets), {
-          duration: 600,
-          stagger: 70
-        });
-      }
-    }
-  }
-
-  onMouseMove(e: MouseEvent): void {
-    if (!this.cardContainer?.nativeElement || this.anim.isReducedMotion()) return;
-    const rect = this.cardContainer.nativeElement.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    const rotateX = (-y / rect.height) * 12;
-    const rotateY = (x / rect.width) * 12;
-    this.cardTransform.set(`perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`);
-  }
-
-  onMouseLeave(): void {
-    this.cardTransform.set('perspective(1000px) rotateX(0deg) rotateY(0deg)');
-  }
 
   onImageError(): void {
     this.imageLoaded.set(false);
   }
 
   onScrollTo(id: string): void {
-    this.journeyState.goToStation(id, 'next');
+    this.scrollSpy.scrollToSection(id);
   }
-
-  ngOnDestroy(): void {}
 }

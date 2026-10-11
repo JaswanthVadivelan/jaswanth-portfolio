@@ -1,16 +1,15 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { HeroComponent } from './features/hero/hero.component';
-import { ArchitectureComponent } from './features/architecture/architecture.component';
-import { RoboticsStationComponent } from './features/robotics-station/robotics-station.component';
-import { GameStationComponent } from './features/game-station/game-station.component';
-import { VaultStationComponent } from './features/vault-station/vault-station.component';
+import { ExperienceComponent } from './features/experience/experience.component';
+import { ProjectsComponent } from './features/projects/projects.component';
+import { SkillsComponent } from './features/skills/skills.component';
+import { EducationComponent } from './features/education/education.component';
+import { AchievementsComponent } from './features/achievements/achievements.component';
 import { ContactComponent } from './features/contact/contact.component';
-import { WorldMapComponent } from './features/world-map/world-map.component';
-import { RouteTransitComponent } from './features/route-transit/route-transit.component';
-import { JourneyStateService } from './core/services/journey-state.service';
+import { ScrollSpyService } from './core/services/scroll-spy.service';
 
 @Component({
   selector: 'app-root',
@@ -19,18 +18,29 @@ import { JourneyStateService } from './core/services/journey-state.service';
     CommonModule,
     NavbarComponent,
     HeroComponent,
-    ArchitectureComponent,
-    RoboticsStationComponent,
-    GameStationComponent,
-    VaultStationComponent,
+    ExperienceComponent,
+    ProjectsComponent,
+    SkillsComponent,
+    EducationComponent,
+    AchievementsComponent,
     ContactComponent,
-    WorldMapComponent,
-    RouteTransitComponent,
     FooterComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
-  readonly journeyState = inject(JourneyStateService);
+export class App implements OnInit, OnDestroy {
+  private readonly scrollSpy = inject(ScrollSpyService);
+
+  ngOnInit(): void {
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        this.scrollSpy.initSpy();
+      }, 100);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.scrollSpy.destroy();
+  }
 }
